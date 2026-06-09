@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directorio de Artesanos</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5; /* Gris claro estilo red social */
+            --card-bg: #ffffff;
+            --text-main: #1c1e21;
+            --text-muted: #65676b;
+            --primary: #6b21a8; /* Morado elegante */
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-color: #e4e6eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .container {
+            max-width: 700px; /* Contenedor más estilizado para tarjetas tipo feed */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* DISEÑO DE LA TARJETA (Estilo Red Social) */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Foto y Nombre al mismo nivel */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            flex-shrink: 0;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .specialty-badge {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 4px;
+            background-color: #f3e8ff;
+            padding: 2px 8px;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        /* Reseña abajo */
+        .card-body {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #333333;
+            padding: 8px 0;
+            border-top: 1px solid #f0f2f5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 5px;
+        }
+
+        .btn-share {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-share:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* MODAL PARA EL QR */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        #qr-image {
+            margin: 20px 0;
+            width: 200px;
+            height: 200px;
+        }
+
+        /* PANEL DE ADMINISTRACIÓN */
+        .admin-lock {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            opacity: 0.2;
+            font-size: 1.5rem;
+            transition: opacity 0.2s;
+        }
+
+        .admin-lock:hover { opacity: 1; }
+
+        #admin-panel {
+            display: none;
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto 20px auto;
+            border: 1px solid var(--border-color);
+        }
+
+        #admin-panel h3 { margin-bottom: 15px; color: var(--primary); }
+
+        #admin-panel input, #admin-panel textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        #admin-panel button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Directorio de Artesanos</h1>
+        <p>Talento local a un solo clic de distancia</p>
+    </header>
+
+    <div id="admin-panel">
+        <h3>Añadir Nuevo Perfil de Artesano</h3>
+        <input type="text" id="nombreInput" placeholder="Nombre completo (Ej. Crisbeth Quiaro)">
+        <input type="text" id="especialidadInput" placeholder="Especialidad (Ej. Cintillos y Accesorios)">
+        <textarea id="resenaInput" rows="3" placeholder="Reseña o biografía del artesano..."></textarea>
+        <input type="url" id="fotoInput" placeholder="URL de la foto de perfil (Opcional)">
+        <button onclick="agregarArtesano()">Publicar Artesano</button>
+    </div>
+
+    <div class="container" id="artesanos-container"></div>
+
+    <div class="modal" id="share-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+            <h3 id="modal-name">Compartir</h3>
+            <img id="qr-image" src="" alt="Código QR">
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Escanea el código QR o copia el enlace directo</p>
+            <button class="btn-share" onclick="copiarLink()" id="btn-copy" style="width: 100%; justify-content: center; background: var(--primary); color: white;">
+                Copiar Enlace
+            </button>
+        </div>
+    </div>
+
+    <div class="admin-lock" onclick="verificarAdmin()">🔒</div>
+
+    <script>
+        // Datos base iniciales con el ejemplo de Crisbeth Quiaro y su reseña
+        const artesanosDefault = [
+            {
+                id: 'art-001',
+                nombre: 'Crisbeth Quiaro',
+                especialidad: 'Cintillos y Accesorios',
+                resena: 'Diseñadora apasionada con un talento único para la creación de cintillos y accesorios personalizados hechos a mano. Cada una de sus piezas combina texturas, colores y elegancia, transformando detalles sencillos en complementos perfectos para resaltar la belleza en cualquier ocasión especial.',
+                foto: 'Crisbeth.jpg'
+            }
+        ];
+
+        let artesanos = JSON.parse(localStorage.getItem('artesanosDB')) || artesanosDefault;
+        let linkActualCompartir = '';
+
+        // Renderizar las tarjetas en la página principal
+        function renderizarArtesanos() {
+            const container = document.getElementById('artesanos-container');
+            container.innerHTML = '';
+
+            // Filtrar si vienen compartiendo un enlace directo (?id=...)
+            const urlParams = new URLSearchParams(window.location.search);
+            const idFiltro = urlParams.get('id');
+
+            let artesanosAMostrar = artesanos;
+            if (idFiltro) {
+                artesanosAMostrar = artesanos.filter(a => a.id === idFiltro);
+                if(artesanosAMostrar.length > 0) {
+                    document.querySelector('header p').innerHTML = `<a href="index.html" style="color: var(--primary); font-weight: bold; text-decoration: none;">← Ver todos los artesanos</a>`;
+                }
+            }
+
+            artesanosAMostrar.forEach(artesano => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <img src="${artesano.foto}" alt="${artesano.nombre}" class="profile-img">
+                        <div class="header-text">
+                            <h3>${artesano.nombre}</h3>
+                            <span class="specialty-badge">${artesano.especialidad}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>${artesano.resena}</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn-share" onclick="abrirModal('${artesano.id}', '${artesano.nombre}')">
+                            🔗 Compartir Perfil
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Modal y Generación de códigos QR
+        function abrirModal(id, nombre) {
+            const urlBase = window.location.href.split('?')[0];
+            linkActualCompartir = `${urlBase}?id=${id}`;
+            
+            document.getElementById('modal-name').innerText = `Perfil de ${nombre}`;
+            document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(linkActualCompartir)}`;
+            
+            document.getElementById('share-modal').style.display = 'flex';
+            document.getElementById('btn-copy').innerText = "Copiar Enlace";
+        }
+
+        function cerrarModal() {
+            document.getElementById('share-modal').style.display = 'none';
+        }
+
+        function copiarLink() {
+            navigator.clipboard.writeText(linkActualCompartir).then(() => {
+                document.getElementById('btn-copy').innerText = "¡Enlace Copiado!";
+            });
+        }
+
+        // Seguridad: Control de Administrador exclusivo
+        function verificarAdmin() {
+            const pass = prompt("Introduce la contraseña de administrador:");
+            if (pass === "1234") { // Puedes cambiar tu contraseña aquí
+                document.getElementById('admin-panel').style.display = 'block';
+                window.scrollTo({top: 0, behavior: 'smooth'});
+                alert("Modo Administrador activado. El formulario de registro está disponible.");
+            } else if (pass !== null) {
+                alert("Acceso denegado. Contraseña incorrecta.");
+            }
+        }
+
+        // Guardar nuevos artesanos
+        function agregarArtesano() {
+            const nombre = document.getElementById('nombreInput').value;
+            const especialidad = document.getElementById('especialidadInput').value;
+            const resena = document.getElementById('resenaInput').value;
+            let foto = document.getElementById('fotoInput').value;
+
+            if (!nombre || !especialidad || !resena) {
+                alert("Por favor, rellena el nombre, la especialidad y la reseña.");
+                return;
+            }
+
+            if (!foto) {
+                // Generador automático de avatares bonitos con iniciales si no pones URL
+                const colors = ['d8b4fe', 'fca5a5', '86efac', '93c5fd', 'fde047'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                foto = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombre)}&background=${randomColor}&color=222&size=200&rounded=true`;
+            }
+
+            const nuevoArtesano = {
+                id: 'art-' + Date.now(),
+                nombre: nombre,
+                especialidad: specialty = especialidad,
+                resena: resena,
+                foto: foto
+            };
+
+            artesanos.push(nuevoArtesano);
+            localStorage.setItem('artesanosDB', JSON.stringify(artesanos));
+            
+            // Limpiar el formulario
+            document.getElementById('nombreInput').value = '';
+            document.getElementById('especialidadInput').value = '';
+            document.getElementById('resenaInput').value = '';
+            document.getElementById('fotoInput').value = '';
+            
+            renderizarArtesanos();
+            alert("¡Nuevo artesano registrado con éxito!");
+        }
+
+        // Inicializar la aplicación al cargar
+        renderizarArtesanos();
+    </script>
+</body>
+</html>
